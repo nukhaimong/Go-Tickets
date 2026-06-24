@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -20,7 +21,7 @@ type JWTClaims struct {
 
 type JWTService interface {
 	GenerateToken(userId uint, email string, name string) (string, error)
-	// ValidateToken(tokenStr string) (*JWTClaims, error)
+	ValidateToken(tokenStr string) (*JWTClaims, error)
 }
 
 type jwtService struct {
@@ -59,4 +60,19 @@ func (js *jwtService) GenerateToken(userId uint, email string, name string) (str
 	return tokenStr, nil
 }
 
-// func (js *jwtService) ValidateToken(tokenStr string) (*JWTClaims, error) {}
+func (js *jwtService) ValidateToken(tokenStr string) (*JWTClaims, error) {
+	token, err := jwt.ParseWithClaims(tokenStr, &JWTClaims{}, func(token *jwt.Token) (any, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing mathod: %v", token.Header["alg"])
+		}
+		return []byte(js.secretkey), nil
+	})
+
+	if err != nil {
+		return nil, fmt.Errorf("Token validation failed: %w", err)
+	}
+	if claims, ok := token.Claims.(*JWTClaims); ok && token.Valid {
+		return claims, nil
+	}
+	return nil, fmt.Errorf("Invalid token")
+}
