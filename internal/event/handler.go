@@ -56,3 +56,11 @@ func (h *handler) CreateEvent(c *echo.Context) error {
 	}
 	return c.JSON(http.StatusCreated, response)
 }
+
+func (h *handler) GetEvents(c *echo.Context) error {
+	events, err := h.service.GetEvents()
+	if err != nil {
+		return eventErrorResponse(c, err)
+	}
+	return c.JSON(http.StatusOK, events)
+}

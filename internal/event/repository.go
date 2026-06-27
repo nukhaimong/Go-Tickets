@@ -10,6 +10,7 @@ var ErrEventNotFound = errors.New("Event not found")
 
 type Repository interface {
 	Create(event *Event) error
+	GetAll() ([]*Event, error)
 }
 
 type respository struct {
@@ -24,4 +25,14 @@ func NewRepository(db *gorm.DB) Repository {
 
 func (r *respository) Create(event *Event) error {
 	return r.db.Create(event).Error
+}
+
+func (r *respository) GetAll() ([]*Event, error) {
+	var events []*Event
+
+	err := r.db.Find(&events).Error
+	if err != nil {
+		return nil, err
+	}
+	return events, nil
 }
