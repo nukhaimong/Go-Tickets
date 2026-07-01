@@ -39,7 +39,7 @@ func Start(db *gorm.DB, cfg *config.Config) {
 		return c.JSON(http.StatusOK, map[string]string{"message": "Hello, World!"})
 	})
 	e.GET("/jekono", func(c *echo.Context) error {
-		return c.JSON(http.StatusOK, "Hello From Jekono!")
+		return c.JSON(http.StatusOK, "Hello From Jekono.com!")
 	})
 
 	// user routes
