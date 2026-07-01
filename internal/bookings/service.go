@@ -51,3 +51,17 @@ func (s *service) CreateBooking(userId uint, req dto.CreateRequest) (*dto.Respon
 	}
 	return booking.ToResponse(), nil
 }
+
+func (s *service) GetMyBookings(userId uint) ([]*dto.Response, error) {
+	bookings, err := s.bookingRepo.GetByUserID(userId)
+	if err != nil {
+		return nil, err
+	}
+	response := make([]*dto.Response, len(bookings))
+
+	for i, b := range bookings {
+		response[i] = b.ToResponse()
+	}
+
+	return response, nil
+}
