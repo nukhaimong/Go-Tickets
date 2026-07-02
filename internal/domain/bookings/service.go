@@ -1,8 +1,8 @@
 package bookings
 
 import (
-	"gotickets/internal/bookings/dto"
-	"gotickets/internal/event"
+	"gotickets/internal/domain/bookings/dto"
+	"gotickets/internal/domain/event"
 
 	"github.com/google/uuid"
 )

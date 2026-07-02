@@ -2,7 +2,7 @@ package event
 
 import (
 	"errors"
-	"gotickets/internal/event/dto"
+	"gotickets/internal/domain/event/dto"
 	httpresponse "gotickets/internal/httpResponse"
 	"net/http"
 	"strconv"

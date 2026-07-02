@@ -3,7 +3,7 @@ package user
 import (
 	"fmt"
 	"gotickets/internal/auth"
-	"gotickets/internal/user/dto"
+	"gotickets/internal/domain/user/dto"
 )
 
 var ErrInvalidCredentials = fmt.Errorf("Invalid Email or Password")
