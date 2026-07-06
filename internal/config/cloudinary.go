@@ -4,7 +4,11 @@ import (
 	"context"
 	"fmt"
 	"mime/multipart"
+	"path"
+	"strings"
 	"time"
+
+	"regexp"
 
 	"github.com/cloudinary/cloudinary-go/v2"
 	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
@@ -52,10 +56,51 @@ func (s *CloudinaryService) UploadEventImage(file multipart.File, fileHeader *mu
 	return resp.SecureURL, nil
 }
 
-// DeleteEventImage deletes an image from Cloudinary (optional)
-func (s *CloudinaryService) DeleteEventImage(publicID string) error {
-	_, err := s.cld.Upload.Destroy(s.ctx, uploader.DestroyParams{
+// extractPublicIDFromURL extracts the public ID from a Cloudinary URL using regex
+func (s *CloudinaryService) extractPublicIDFromURL(photoURL string) (string, error) {
+	if photoURL == "" {
+		return "", fmt.Errorf("photo URL is empty")
+	}
+
+	// Regex to extract public ID
+	// Handles: /upload/v1234567890/folder/image.jpg or /upload/folder/image.jpg
+	re := regexp.MustCompile(`/upload/(?:v\d+/)?([^?]+)`)
+	matches := re.FindStringSubmatch(photoURL)
+
+	if len(matches) < 2 {
+		return "", fmt.Errorf("could not extract public ID from URL: %s", photoURL)
+	}
+
+	// Remove file extension
+	publicID := strings.TrimSuffix(matches[1], path.Ext(matches[1]))
+
+	if publicID == "" {
+		return "", fmt.Errorf("extracted public ID is empty")
+	}
+
+	return publicID, nil
+}
+
+func (s *CloudinaryService) DeleteEventImage(photoURL string) error {
+	// Extract public ID from the URL
+	publicID, err := s.extractPublicIDFromURL(photoURL)
+	if err != nil {
+		return fmt.Errorf("failed to extract public ID: %w", err)
+	}
+
+	// Delete from Cloudinary
+	result, err := s.cld.Upload.Destroy(s.ctx, uploader.DestroyParams{
 		PublicID: publicID,
 	})
-	return err
+
+	if err != nil {
+		return fmt.Errorf("failed to delete image: %w", err)
+	}
+
+	// Check if the deletion was successful
+	if result.Result != "ok" {
+		return fmt.Errorf("cloudinary deletion failed: %s", result.Result)
+	}
+
+	return nil
 }
