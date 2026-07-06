@@ -30,6 +30,16 @@ func Start(db *gorm.DB, cfg *config.Config) {
 	e := echo.New()
 	db.AutoMigrate(&user.User{}, &event.Event{}, &bookings.Booking{})
 
+	// CORS configuration
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins:     []string{cfg.FrontendURL},
+		AllowMethods:     []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete, http.MethodOptions},
+		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization, echo.HeaderXRequestedWith},
+		ExposeHeaders:    []string{echo.HeaderContentLength},
+		AllowCredentials: true,
+		MaxAge:           43200, // 12 hours
+	}))
+
 	e.Use(middleware.RequestLogger())
 	e.Use(middleware.Recover())
 

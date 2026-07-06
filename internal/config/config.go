@@ -9,9 +9,10 @@ import (
 )
 
 type Config struct {
-	Port      string
-	Dsn       string
-	JwtSecret string
+	Port        string
+	Dsn         string
+	JwtSecret   string
+	FrontendURL string
 }
 
 func LoadEnv() *Config {
@@ -22,8 +23,9 @@ func LoadEnv() *Config {
 		log.Fatal("Error loading .env file")
 	}
 	return &Config{
-		Port:      os.Getenv("PORT"),
-		Dsn:       os.Getenv("DSN"),
-		JwtSecret: os.Getenv("JWT_SECRET"),
+		Port:        os.Getenv("PORT"),
+		Dsn:         os.Getenv("DSN"),
+		JwtSecret:   os.Getenv("JWT_SECRET"),
+		FrontendURL: os.Getenv("FRONTEND_URL"),
 	}
 }
