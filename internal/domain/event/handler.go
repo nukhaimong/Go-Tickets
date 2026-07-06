@@ -137,12 +137,68 @@ func (h *handler) UpdateEvent(c *echo.Context) error {
 
 	var req dto.UpdateRequest
 
-	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, httpresponse.Error{
-			Code:    http.StatusBadRequest,
-			Message: "Invalid request payload",
-			Details: err.Error(),
-		})
+	// if err := c.Bind(&req); err != nil {
+	// 	return c.JSON(http.StatusBadRequest, httpresponse.Error{
+	// 		Code:    http.StatusBadRequest,
+	// 		Message: "Invalid request payload",
+	// 		Details: err.Error(),
+	// 	})
+	// }
+
+	title := c.FormValue("title")
+	if title != "" {
+		req.Title = &title
+	}
+	description := c.FormValue("description")
+	if description != "" {
+		req.Description = &description
+	}
+	location := c.FormValue("location")
+	if location != "" {
+		req.Location = &location
+	}
+	startsAtStr := c.FormValue("starts_at")
+	if startsAtStr != "" {
+		startsAt, err := time.Parse("2006-01-02 15:04:05", startsAtStr)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, httpresponse.Error{
+				Code:    http.StatusBadRequest,
+				Message: "Invalid date format",
+				Details: err.Error(),
+			})
+		}
+		req.StartsAt = &startsAt
+	}
+
+	totalTicketsStr := c.FormValue("total_tickets")
+	if totalTicketsStr != "" {
+		totalTickets, err := strconv.Atoi(totalTicketsStr)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, httpresponse.Error{
+				Code:    http.StatusBadRequest,
+				Message: "Invalid total tickets value",
+				Details: err.Error(),
+			})
+		}
+		req.TotalTickets = &totalTickets
+	}
+
+	priceStr := c.FormValue("price")
+	if priceStr != "" {
+		price, err := strconv.Atoi(priceStr)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, httpresponse.Error{
+				Code:    http.StatusBadRequest,
+				Message: "Invalid price value",
+				Details: err.Error(),
+			})
+		}
+		req.Price = &price
+	}
+
+	fileHeader, err := c.FormFile("photo")
+	if err == nil {
+		req.Photo = fileHeader
 	}
 
 	if err := c.Validate(&req); err != nil {

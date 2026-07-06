@@ -2,6 +2,7 @@ package event
 
 import (
 	"errors"
+	"fmt"
 	"gotickets/internal/config"
 	"gotickets/internal/domain/event/dto"
 )
@@ -78,23 +79,53 @@ func (s *service) UpdateEvent(eventId uint, req *dto.UpdateRequest) (*dto.Respon
 	if err != nil {
 		return nil, err
 	}
-	if req.Title != "" {
-		event.Title = req.Title
+	if req.Title != nil {
+		event.Title = *req.Title
 	}
-	if req.Description != "" {
-		event.Description = req.Description
-	}
-
-	if req.Location != "" {
-		event.Location = req.Location
+	if req.Description != nil {
+		event.Description = *req.Description
 	}
 
-	if req.Price != 0 {
-		event.Price = req.Price
+	if req.Location != nil {
+		event.Location = *req.Location
 	}
-	if !req.StartsAt.IsZero() {
-		event.StartsAt = req.StartsAt
+
+	if req.Price != nil {
+		event.Price = *req.Price
 	}
+	if req.StartsAt != nil && !req.StartsAt.IsZero() {
+		event.StartsAt = *req.StartsAt
+	}
+	if req.TotalTickets != nil {
+		// Adjust available tickets based on the change in total tickets
+		difference := *req.TotalTickets - event.TotalTickets
+		event.AvailableTickets += difference
+		event.TotalTickets = *req.TotalTickets
+	}
+
+	if req.Photo != nil {
+		file, err := req.Photo.Open()
+		if err != nil {
+			return nil, errors.New("Failed to open file: " + err.Error())
+		}
+		defer file.Close()
+
+		// delete the old photo from cloudinary if it exists
+		if event.PhotoURL != "" {
+			err := s.cloudinary.DeleteEventImage(event.PhotoURL)
+			if err != nil {
+				return nil, errors.New("failed to delete old photo: " + err.Error())
+			}
+			fmt.Println("successfully deleted photo: ", event.PhotoURL)
+		}
+		// upload file to cloudinary
+		photoURL, err := s.cloudinary.UploadEventImage(file, req.Photo)
+		if err != nil {
+			return nil, errors.New("failed to upload photo: " + err.Error())
+		}
+		event.PhotoURL = photoURL
+	}
+
 	if err := s.repo.Update(event); err != nil {
 		return nil, err
 	}
