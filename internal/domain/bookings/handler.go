@@ -5,6 +5,7 @@ import (
 	"gotickets/internal/domain/bookings/dto"
 	"gotickets/internal/domain/event"
 	httpresponse "gotickets/internal/httpResponse"
+	"gotickets/internal/utils"
 	"net/http"
 
 	"github.com/labstack/echo/v5"
@@ -16,11 +17,6 @@ type handler struct {
 
 func NewHandler(s *service) *handler {
 	return &handler{service: s}
-}
-
-func getCurrentUserID(c *echo.Context) (uint, bool) {
-	userId, ok := c.Get("user_id").(uint)
-	return userId, ok
 }
 
 func bookingErrorResponse(c *echo.Context, err error) error {
@@ -67,7 +63,7 @@ func bookingErrorResponse(c *echo.Context, err error) error {
 }
 
 func (h *handler) CreateBooking(c *echo.Context) error {
-	userId, ok := getCurrentUserID(c)
+	userId, ok := utils.GetCurrentUserID(c)
 	if !ok {
 		return c.JSON(http.StatusUnauthorized, httpresponse.Error{
 			Code:    http.StatusUnauthorized,
@@ -102,7 +98,7 @@ func (h *handler) CreateBooking(c *echo.Context) error {
 }
 
 func (h *handler) GetMyBookings(c *echo.Context) error {
-	userId, ok := getCurrentUserID(c)
+	userId, ok := utils.GetCurrentUserID(c)
 	if !ok {
 		return c.JSON(http.StatusUnauthorized, httpresponse.Error{
 			Code:    http.StatusUnauthorized,

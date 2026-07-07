@@ -19,8 +19,9 @@ func NewService(repo Repository, cloudinary *config.CloudinaryService) *service 
 	}
 }
 
-func (s *service) CreateEvent(req *dto.CreateRequest) (*dto.Response, error) {
+func (s *service) CreateEvent(req *dto.CreateRequest, userId uint) (*dto.Response, error) {
 	event := &Event{
+		UserID:           userId,
 		Title:            req.Title,
 		Description:      req.Description,
 		Location:         req.Location,
@@ -74,11 +75,16 @@ func (s *service) GetEventById(eventId uint) (*dto.Response, error) {
 	return event.ToResponse(), nil
 }
 
-func (s *service) UpdateEvent(eventId uint, req *dto.UpdateRequest) (*dto.Response, error) {
+func (s *service) UpdateEvent(eventId uint, userId uint, req *dto.UpdateRequest) (*dto.Response, error) {
 	event, err := s.repo.GetEventByID(eventId)
 	if err != nil {
 		return nil, err
 	}
+
+	if userId != event.UserID {
+		return nil, errors.New("Uauthorize to update the event")
+	}
+
 	if req.Title != nil {
 		event.Title = *req.Title
 	}

@@ -4,6 +4,7 @@ import "time"
 
 type Response struct {
 	ID               uint      `json:"id"`
+	UserID           uint      `json:"user_id"`
 	Title            string    `json:"title"`
 	Description      string    `json:"description"`
 	Location         string    `json:"location"`
@@ -11,6 +12,6 @@ type Response struct {
 	TotalTickets     int       `json:"total_tickets"`
 	AvailableTickets int       `json:"available_tickets"`
 	Price            int       `json:"price"`
-	CreatedAt        string    `json:"create_at"`
+	CreatedAt        string    `json:"created_at"`
 	PhotoURL         string    `json:"photo_url"`
 }

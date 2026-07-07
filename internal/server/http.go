@@ -55,7 +55,7 @@ func Start(db *gorm.DB, cfg *config.Config) {
 	// user routes
 	user.RegisterRoutes(e, db, cfg)
 	//event routes
-	event.RegisterRoutes(e, db)
+	event.RegisterRoutes(e, db, cfg)
 	// bookings routes
 	bookings.RegisterRoutes(e, db, cfg)
 	// port

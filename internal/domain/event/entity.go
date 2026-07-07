@@ -9,6 +9,7 @@ import (
 
 type Event struct {
 	gorm.Model
+	UserID           uint      `json:"user_id" gorm:"not null"`
 	Title            string    `json:"title" gorm:"type:varchar(150);not null"`
 	Description      string    `json:"description" gorm:"type:text"`
 	Location         string    `json:"location" gorm:"type:varchar(150);not null"`
@@ -22,6 +23,7 @@ type Event struct {
 func (e *Event) ToResponse() *dto.Response {
 	return &dto.Response{
 		ID:               e.ID,
+		UserID:           e.UserID,
 		Title:            e.Title,
 		Description:      e.Description,
 		Location:         e.Location,

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"gotickets/internal/domain/event/dto"
 	httpresponse "gotickets/internal/httpResponse"
+	"gotickets/internal/utils"
 	"net/http"
 	"strconv"
 	"time"
@@ -46,6 +47,14 @@ func (h *handler) CreateEvent(c *echo.Context) error {
 	// 	})
 	// }
 
+	// get user id from middleware
+	userId, ok := utils.GetCurrentUserID(c)
+	if !ok {
+		return c.JSON(http.StatusUnauthorized, httpresponse.Error{
+			Code:    http.StatusUnauthorized,
+			Message: "Unauthorize",
+		})
+	}
 	//Bind form data
 	req.Title = c.FormValue("title")
 	req.Description = c.FormValue("description")
@@ -94,7 +103,7 @@ func (h *handler) CreateEvent(c *echo.Context) error {
 		})
 	}
 
-	response, err := h.service.CreateEvent(&req)
+	response, err := h.service.CreateEvent(&req, userId)
 	if err != nil {
 		return eventErrorResponse(c, err)
 	}
@@ -132,6 +141,13 @@ func (h *handler) UpdateEvent(c *echo.Context) error {
 			Code:    http.StatusBadRequest,
 			Message: "Invalid event id",
 			Details: err.Error(),
+		})
+	}
+	userId, ok := utils.GetCurrentUserID(c)
+	if !ok {
+		return c.JSON(http.StatusUnauthorized, httpresponse.Error{
+			Code:    http.StatusUnauthorized,
+			Message: "Unauthorize",
 		})
 	}
 
@@ -209,7 +225,7 @@ func (h *handler) UpdateEvent(c *echo.Context) error {
 		})
 	}
 
-	response, err := h.service.UpdateEvent(uint(eventId), &req)
+	response, err := h.service.UpdateEvent(uint(eventId), userId, &req)
 
 	if err != nil {
 		return eventErrorResponse(c, err)
