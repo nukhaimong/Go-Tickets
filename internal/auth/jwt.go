@@ -9,7 +9,7 @@ import (
 
 const (
 	jwtSecretKey         = "secret_key"
-	defaultTokenDuration = 24 * time.Hour // one day
+	defaultTokenDuration = 24 * 7 * time.Hour // seven day
 )
 
 type JWTClaims struct {

@@ -38,10 +38,17 @@ func (s *service) CreateUser(req dto.CreateRequest) (*dto.Response, error) {
 		return nil, err
 	}
 
+	// generate toke
+	token, err := s.jwtService.GenerateToken(user.ID, user.Email, user.Name)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to generate token: %w", err)
+	}
+
 	response := dto.Response{
 		ID:        user.ID,
 		Name:      user.Name,
 		Email:     user.Email,
+		Token:     token,
 		CreatedAt: user.CreatedAt.String(),
 	}
 

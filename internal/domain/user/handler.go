@@ -78,7 +78,7 @@ func (h *handler) LoginUser(c *echo.Context) error {
 		if errors.Is(err, ErrInvalidCredentials) {
 			return c.JSON(http.StatusUnauthorized, httpresponse.Error{
 				Code:    http.StatusUnauthorized,
-				Message: "Invalid Email",
+				Message: "Invalid Email or password",
 				Details: err.Error(),
 			})
 		}
