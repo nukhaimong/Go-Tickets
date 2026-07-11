@@ -7,7 +7,7 @@ import (
 
 type CreateRequest struct {
 	Title        string                `form:"title" validate:"required,min=2,max=150"`
-	Description  string                `form:"description" validate:"required,max=1000"`
+	Description  string                `form:"description" validate:"required"`
 	Location     string                `form:"location" validate:"required"`
 	StartsAt     time.Time             `form:"starts_at" validate:"required"`
 	TotalTickets int                   `form:"total_tickets" validate:"required,gt=0"`

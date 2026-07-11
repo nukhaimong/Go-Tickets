@@ -61,7 +61,15 @@ func (h *handler) CreateEvent(c *echo.Context) error {
 	req.Location = c.FormValue("location")
 	startsAtStr := c.FormValue("starts_at")
 
-	startsAt, err := time.Parse("2006-01-02 15:04:05", startsAtStr)
+	loc, err := time.LoadLocation("Asia/Dhaka")
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, httpresponse.Error{
+			Code:    http.StatusInternalServerError,
+			Message: "Failed to load timezone",
+			Details: err.Error(),
+		})
+	}
+	startsAt, err := time.ParseInLocation("2006-01-02 15:04:05", startsAtStr, loc)
 
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, httpresponse.Error{

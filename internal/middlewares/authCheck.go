@@ -16,6 +16,7 @@ func AuthMiddleware(jwtService auth.JWTService) echo.MiddlewareFunc {
 			if authHeader == "" {
 				return c.JSON(http.StatusUnauthorized, map[string]string{
 					"error": "Missing authorization header",
+					"message": "Missing authorization header",
 				})
 			}
 			//check bearer schema
@@ -23,6 +24,7 @@ func AuthMiddleware(jwtService auth.JWTService) echo.MiddlewareFunc {
 			if len(parts) != 2 || parts[0] != "Bearer" {
 				return c.JSON(http.StatusUnauthorized, map[string]string{
 					"error": "Invalid authorization header format",
+					"message": "Invalid authorization header format",
 				})
 			}
 			tokenString := parts[1]
@@ -31,6 +33,7 @@ func AuthMiddleware(jwtService auth.JWTService) echo.MiddlewareFunc {
 			if err != nil {
 				return c.JSON(http.StatusUnauthorized, map[string]string{
 					"error": "Invalid or expired token",
+					"message": "Invalid or expired token",
 				})
 			}
 			// store user info in context from handler
