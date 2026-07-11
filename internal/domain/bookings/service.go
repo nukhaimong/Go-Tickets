@@ -47,6 +47,14 @@ func (s *service) GetMyBookings(userId uint) ([]*dto.Response, error) {
 	return response, nil
 }
 
+func(s *service) GetByID(bookingId uint) (*dto.Response, error) {
+	booking, err := s.bookingRepo.GetByID(bookingId)
+	if err != nil {
+		return nil, err
+	}
+	return booking.ToResponse(), nil
+}
+
 func (s *service) CreateBooking(userId uint, req dto.CreateRequest) (*dto.Response, error) {
 	// 1. Get event
 	eventData, err := s.eventRepo.GetEventByID(req.EventID)

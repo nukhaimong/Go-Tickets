@@ -30,4 +30,5 @@ func RegisterRoutes(e *echo.Echo, db *gorm.DB, cfg *config.Config) {
 
 	api.POST("", bookingHandler.CreateBooking)
 	api.GET("", bookingHandler.GetMyBookings)
+	api.GET("/:id", bookingHandler.GetByID)
 }
