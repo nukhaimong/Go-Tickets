@@ -182,17 +182,24 @@ func (h *handler) UpdateEvent(c *echo.Context) error {
 		req.Location = &location
 	}
 	startsAtStr := c.FormValue("starts_at")
-	if startsAtStr != "" {
-		startsAt, err := time.Parse("2006-01-02 15:04:05", startsAtStr)
-		if err != nil {
-			return c.JSON(http.StatusBadRequest, httpresponse.Error{
-				Code:    http.StatusBadRequest,
-				Message: "Invalid date format",
-				Details: err.Error(),
-			})
-		}
-		req.StartsAt = &startsAt
+	loc, err := time.LoadLocation("Asia/Dhaka")
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, httpresponse.Error{
+			Code:    http.StatusInternalServerError,
+			Message: "Failed to load timezone",
+			Details: err.Error(),
+		})
 	}
+	startsAt, err := time.ParseInLocation("2006-01-02 15:04:05", startsAtStr, loc)
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, httpresponse.Error{
+			Code:    http.StatusBadRequest,
+			Message: "Invalid date format",
+			Details: err.Error(),
+		})
+	}
+	req.StartsAt = &startsAt
 
 	totalTicketsStr := c.FormValue("total_tickets")
 	if totalTicketsStr != "" {
